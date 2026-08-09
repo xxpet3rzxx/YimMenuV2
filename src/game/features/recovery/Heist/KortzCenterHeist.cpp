@@ -144,14 +144,13 @@ namespace YimMenu::Features
 			}
 		};
 
-		// State 10: begin primary-target interaction.
 		class TakePrimaryTarget : public Command
 		{
 			using Command::Command;
 			virtual void OnCall() override
 			{
-				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
-					*ScriptLocal(thread, 29355).At(11).As<int*>() = 17;
+			   if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
+			*ScriptLocal(thread, 29355).At(11).As<int*>() = 17;
 			}
 		};
 
@@ -257,8 +256,7 @@ namespace YimMenu::Features
 		static SkipDataCrack _KortzCenterSkipDataCrack{"kortzcenterheistskipdatacrack", "Skip Data Crack", "Skips data crack minigame"};
 		static CutGlass _KortzCenterCutGlass{"kortzcenterheistcutglass", "Cut Glass", "Sets all five glass target indices 0-4 to 100%"};
 		static DisableLaserGrid _KortzCenterDisableLaser{"kortzcenterheistdisablelaser", "Disable Laser Grid", "Disables laser security grid"};
-		static TakePrimaryTarget _KortzCenterTakePrimary{"kortzcenterheisttakeprimary", "Take Primary Target", "Primary state 10 - interact once, then use Finish Primary Target"};
-		static FinishPrimaryTarget _KortzCenterFinishPrimary{"kortzcenterheistfinishprimary", "Finish Primary Target", "Primary state 17 - use after the state 10 interaction"};
+		static TakePrimaryTarget _KortzCenterTakePrimary{"kortzcenterheisttakeprimary", "Take Primary Target", "Primary state 17 - completes the primary target interaction"};
 		static EnableSoloSecondaryTargets _KortzCenterEnableSoloSecondary{"kortzcenterheistenablesolosecondary", "Enable Solo Secondary Targets", "Resets Level 2 2-player-room exhibit interaction and loot flags for solo use"};
 		static TakeSecondaryTarget _KortzCenterTakeSecondary{"kortzcenterheisttakesecondary", "Take Secondary Target", "Secondary target state 3 - interact/cut once after using it"};
 		static Setup _KortzCenterSetup{"kortzcenterheistsetup", "Setup", "Sets up Kortz Center heist"};

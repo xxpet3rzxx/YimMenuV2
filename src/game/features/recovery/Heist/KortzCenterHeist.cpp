@@ -151,17 +151,6 @@ namespace YimMenu::Features
 			virtual void OnCall() override
 			{
 				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
-					*ScriptLocal(thread, 29355).At(11).As<int*>() = 10;
-			}
-		};
-
-		// state 17 finishes primary-target interaction.
-		class FinishPrimaryTarget : public Command
-		{
-			using Command::Command;
-			virtual void OnCall() override
-			{
-				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
 					*ScriptLocal(thread, 29355).At(11).As<int*>() = 17;
 			}
 		};

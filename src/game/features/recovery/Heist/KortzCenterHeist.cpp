@@ -51,6 +51,12 @@ namespace YimMenu::Features
 		static BoolCommand _KortzCenterPowerDrills{"kortzcenterheistpowerdrills", "Power Drills", "Power drills purchased", true};
 		static BoolCommand _KortzCenterEMPCharges{"kortzcenterheistempcharges", "EMP Charges", "EMP charges purchased", true};
 
+		// --- General Options (MPX_K26_GENERAL_BS) ---
+		// Hard Mode disabled = Normal Mode; enabled = Hard Mode.
+		static BoolCommand _KortzCenterManholeKey{"kortzcenterheistmanholekey", "Manhole Key", "Enable Manhole Key (GENERAL_BS bit 27)", false};
+		static BoolCommand _KortzCenterHardMode{"kortzcenterheisthardmode", "Hard Mode", "Disabled = Normal Mode, enabled = Hard Mode (GENERAL_BS bit 28)", false};
+		static BoolCommand _KortzCenterWeakGuards{"kortzcenterheistweakguards", "Weak Guards", "Enable weak guards (GENERAL_BS bit 31)", false};
+
 		// --- Prep Work Items ---
 		static BoolCommand _KortzCenterScopeOut{"kortzcenterheistscopeout", "Scope Out", "Scope out Kortz Center", true};
 		static BoolCommand _KortzCenterAlphaMail{"kortzcenterheistalphamail", "Alpha Mail Disguise", "Alpha mail disguise", true};
@@ -81,7 +87,6 @@ namespace YimMenu::Features
 		class SkipFingerprint : public Command
 		{
 			using Command::Command;
-
 			virtual void OnCall() override
 			{
 				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
@@ -92,7 +97,6 @@ namespace YimMenu::Features
 		class SkipSignalNodes : public Command
 		{
 			using Command::Command;
-
 			virtual void OnCall() override
 			{
 				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
@@ -103,7 +107,6 @@ namespace YimMenu::Features
 		class SkipDataCrack : public Command
 		{
 			using Command::Command;
-
 			virtual void OnCall() override
 			{
 				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
@@ -114,21 +117,23 @@ namespace YimMenu::Features
 			}
 		};
 
+		// Cut Glass supports target indices 0-4.
 		class CutGlass : public Command
 		{
 			using Command::Command;
-
 			virtual void OnCall() override
 			{
 				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
-					*ScriptLocal(thread, 32855).At(4, 13).At(3).As<float*>() = 100.0f;
+				{
+					for (int i = 0; i <= 4; ++i)
+						*ScriptLocal(thread, 32855).At(i, 13).At(3).As<float*>() = 100.0f;
+				}
 			}
 		};
 
 		class DisableLaserGrid : public Command
 		{
 			using Command::Command;
-
 			virtual void OnCall() override
 			{
 				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
@@ -139,10 +144,10 @@ namespace YimMenu::Features
 			}
 		};
 
+		// State 10: begin primary-target interaction.
 		class TakePrimaryTarget : public Command
 		{
 			using Command::Command;
-
 			virtual void OnCall() override
 			{
 				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
@@ -150,10 +155,39 @@ namespace YimMenu::Features
 			}
 		};
 
+		// state 17 finishes primary-target interaction.
+		class FinishPrimaryTarget : public Command
+		{
+			using Command::Command;
+			virtual void OnCall() override
+			{
+				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
+					*ScriptLocal(thread, 29355).At(11).As<int*>() = 17;
+			}
+		};
+
+		// reset interaction/loot flags for Level 2 exhibits normally
+		// located in the 2-player room, allowing the solo interaction path.
+		class EnableSoloSecondaryTargets : public Command
+		{
+			using Command::Command;
+			virtual void OnCall() override
+			{
+				constexpr int targetIndices[] = {0, 1, 5, 6, 7, 20, 21};
+
+				for (const int i : targetIndices)
+				{
+					const int base = 4980736 + 1 + 29174 + (i * 333);
+					*ScriptGlobal(base + 68).As<int*>()  = 0;
+					*ScriptGlobal(base + 143).As<int*>() = 0;
+				}
+			}
+		};
+
+		// secondary-target interaction.
 		class TakeSecondaryTarget : public Command
 		{
 			using Command::Command;
-
 			virtual void OnCall() override
 			{
 				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
@@ -164,7 +198,6 @@ namespace YimMenu::Features
 		class AutoEnterPcAccessCode : public Command
 		{
 			using Command::Command;
-
 			virtual void OnCall() override
 			{
 				if (auto thread = Scripts::FindScriptThread("fm_mission_controller_v3"_J))
@@ -183,7 +216,6 @@ namespace YimMenu::Features
 		class Setup : public Command
 		{
 			using Command::Command;
-
 			virtual void OnCall() override
 			{
 				int generalBits = -1;
@@ -191,6 +223,11 @@ namespace YimMenu::Features
 				if (!_KortzCenterGlassCutter.GetState()) generalBits &= ~(1 << 6);
 				if (!_KortzCenterPowerDrills.GetState()) generalBits &= ~(1 << 7);
 				if (!_KortzCenterEMPCharges.GetState()) generalBits &= ~(1 << 8);
+
+				// GENERAL_BS options.
+				if (!_KortzCenterManholeKey.GetState()) generalBits &= ~(1 << 27);
+				if (!_KortzCenterHardMode.GetState()) generalBits &= ~(1 << 28);
+				if (!_KortzCenterWeakGuards.GetState()) generalBits &= 0x7FFFFFFF;
 
 				int robberyProg = -1;
 				if (!_KortzCenterScopeOut.GetState()) robberyProg &= ~(1 << 0);
@@ -229,10 +266,12 @@ namespace YimMenu::Features
 		static SkipFingerprint _KortzCenterSkipFingerprint{"kortzcenterheistskipfingerprint", "Skip Fingerprint Hack", "Skips fingerprint hacking minigame in computer room"};
 		static SkipSignalNodes _KortzCenterSkipSignalNodes{"kortzcenterheistskipsignalnodes", "Skip Signal Nodes", "Skips signal nodes hacking at vault keypad"};
 		static SkipDataCrack _KortzCenterSkipDataCrack{"kortzcenterheistskipdatacrack", "Skip Data Crack", "Skips data crack minigame"};
-		static CutGlass _KortzCenterCutGlass{"kortzcenterheistcutglass", "Cut Glass", "Cuts display case glass instantly"};
+		static CutGlass _KortzCenterCutGlass{"kortzcenterheistcutglass", "Cut Glass", "Sets all five glass target indices 0-4 to 100%"};
 		static DisableLaserGrid _KortzCenterDisableLaser{"kortzcenterheistdisablelaser", "Disable Laser Grid", "Disables laser security grid"};
-		static TakePrimaryTarget _KortzCenterTakePrimary{"kortzcenterheisttakeprimary", "Take Primary Target", "Takes primary target painting (stand near it)"};
-		static TakeSecondaryTarget _KortzCenterTakeSecondary{"kortzcenterheisttakesecondary", "Take Secondary Target", "Takes secondary loot (stand near it)"};
+		static TakePrimaryTarget _KortzCenterTakePrimary{"kortzcenterheisttakeprimary", "Take Primary Target", "Primary state 10 - interact once, then use Finish Primary Target"};
+		static FinishPrimaryTarget _KortzCenterFinishPrimary{"kortzcenterheistfinishprimary", "Finish Primary Target", "Primary state 17 - use after the state 10 interaction"};
+		static EnableSoloSecondaryTargets _KortzCenterEnableSoloSecondary{"kortzcenterheistenablesolosecondary", "Enable Solo Secondary Targets", "Resets Level 2 2-player-room exhibit interaction and loot flags for solo use"};
+		static TakeSecondaryTarget _KortzCenterTakeSecondary{"kortzcenterheisttakesecondary", "Take Secondary Target", "Secondary target state 3 - interact/cut once after using it"};
 		static Setup _KortzCenterSetup{"kortzcenterheistsetup", "Setup", "Sets up Kortz Center heist"};
 		static AutoEnterPcAccessCode _KortzCenterAutoEnterPcAccessCode{"kortzcenterheistautoenterpcaccesscode", "Auto-Enter PC Access Code", "Automatically enters the PC access code"};
 	}

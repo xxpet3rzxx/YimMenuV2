@@ -59,10 +59,9 @@ namespace YimMenu::Submenus
 		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheistcutglass"_J));
 		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheistdisablelaser"_J));
 		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheisttakeprimary"_J));
+		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheistfinishprimary"_J));
 		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheistenablesolosecondary"_J));
 		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheisttakesecondary"_J));
-
-		action->AddItem(std::make_shared<CommandItem>("kortzcenterheistsetup"_J));
 
 		tab->AddItem(target);
 		tab->AddItem(general);

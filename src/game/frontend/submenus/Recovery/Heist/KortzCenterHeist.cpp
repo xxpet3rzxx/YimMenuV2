@@ -4,16 +4,16 @@ namespace YimMenu::Submenus
 {
 	std::shared_ptr<TabItem> RenderKortzCenterHeistMenu()
 	{
-		auto tab   = std::make_shared<TabItem>("Kortz Center Heist");
+		auto tab = std::make_shared<TabItem>("Kortz Center Heist");
 
-		auto target    = std::make_shared<Group>("Primary Target", 1);
-		auto general   = std::make_shared<Group>("General", 2);
+		auto target  = std::make_shared<Group>("Primary Target", 1);
+		auto general = std::make_shared<Group>("General", 2);
 
 		auto vehicles  = std::make_shared<CollapsingHeaderItem>("Vehicles");
 		auto equipment = std::make_shared<CollapsingHeaderItem>("Equipment");
 		auto intel     = std::make_shared<CollapsingHeaderItem>("Intel");
 
-		auto action    = std::make_shared<Group>("", 1);
+		auto action = std::make_shared<Group>("", 1);
 
 		target->AddItem(std::make_shared<ListCommandItem>("kortzcenterheistprimarytarget"_J));
 
@@ -21,6 +21,9 @@ namespace YimMenu::Submenus
 		general->AddItem(std::make_shared<BoolCommandItem>("kortzcenterheistglasscutter"_J));
 		general->AddItem(std::make_shared<BoolCommandItem>("kortzcenterheistpowerdrills"_J));
 		general->AddItem(std::make_shared<BoolCommandItem>("kortzcenterheistempcharges"_J));
+		general->AddItem(std::make_shared<BoolCommandItem>("kortzcenterheistmanholekey"_J));
+		general->AddItem(std::make_shared<BoolCommandItem>("kortzcenterheisthardmode"_J));
+		general->AddItem(std::make_shared<BoolCommandItem>("kortzcenterheistweakguards"_J));
 
 		vehicles->AddItem(std::make_shared<BoolCommandItem>("kortzcenterheistcaracara"_J));
 		vehicles->AddItem(std::make_shared<BoolCommandItem>("kortzcenterheistannihilator"_J));
@@ -56,6 +59,7 @@ namespace YimMenu::Submenus
 		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheistcutglass"_J));
 		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheistdisablelaser"_J));
 		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheisttakeprimary"_J));
+		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheistenablesolosecondary"_J));
 		inHeist->AddItem(std::make_shared<CommandItem>("kortzcenterheisttakesecondary"_J));
 
 		action->AddItem(std::make_shared<CommandItem>("kortzcenterheistsetup"_J));
